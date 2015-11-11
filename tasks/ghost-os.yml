@@ -1,12 +1,21 @@
 ---
 
-- name: Ghost | Setup Ghost service
-  template: src=etc/init/ghost.conf.j2 dest=/etc/init/ghost.conf
-  notify: restart ghost
-  tags: [ghost]
+- name: install packages
+  become: true
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+   - unzip
+  tags:
+    - packages
 
-- name: Ghost | Setup Ghost service (for systemd users)
-  template: src=etc/init/ghost.systemd.conf.j2 dest=/etc/systemd/system/ghost.service mode=755
-  notify: restart ghost
-  tags: [ghost]
-  when: ansible_distribution == 'Ubuntu' and ( ansible_distribution_release == 'vivid' or ansible_distribution_release == 'wily' )
+   # - npm
+   # - nodejs-legacy
+
+
+
+
+# - name: Ghost | Setup Ghost service
+#   template: src=ghost.conf.j2 dest=/etc/init/ghost.conf
+#   notify: restart ghost
+#   tags: [ghost, bug]
+#   become: yes

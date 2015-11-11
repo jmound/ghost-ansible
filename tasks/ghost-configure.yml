@@ -6,9 +6,10 @@
     createhome=yes
     shell=/bin/bash
     state=present
+  become: yes
 
-- name: Ghost | Installing unzip
-  apt: name=unzip update_cache=yes
+# - name: Ghost | Installing unzip
+#   apt: name=unzip update_cache=yes
 
 - name: Ghost | Create ghost install dir
   file: path={{ ghost_install_dir }} state=directory owner={{ ghost_user }} group={{ ghost_user }}
@@ -27,14 +28,36 @@
 - name: Ghost | Extract ghost release
   command: unzip -qod {{ ghost_install_dir }} /tmp/ghost.zip
   when: upgrade_ghost or not ghost_release_path.stat.exists
+  become: yes
+  become_user: ghost
 
-- name: Ghost | Update ownership of ghost dir
-  file: path={{ ghost_install_dir }} owner={{ ghost_user }} recurse=yes state=directory
-  when: upgrade_ghost or not ghost_release_path.stat.exists
+# - name: Ghost | Update ownership of ghost dir
+#   file: path={{ ghost_install_dir }} owner={{ ghost_user }} recurse=yes state=directory
+#   when: upgrade_ghost or not ghost_release_path.stat.exists
 
 - name: Ghost | Install node dependencies
   npm: path={{ ghost_install_dir }} production=yes
+  become: yes
+  become_user: ghost
+
+- name: Ghost | Setup Ghost service
+  template: src=ghost.conf.j2 dest=/etc/init/ghost.conf
+  # notify: restart ghost
+  tags: [ghost, bug]
+  become: yes
 
 - name: Ghost | Configure ghost
   template: src=config.js.j2 dest={{ ghost_install_dir }}/config.js
   notify: restart ghost
+  become: yes
+  become_user: ghost
+  tags: [config]
+
+- name: ensure the Ghost service is started
+  service: name=ghost state=started enabled=yes
+  tags: [ghost]
+  sudo: true
+
+
+#   # sudo: yes
+
