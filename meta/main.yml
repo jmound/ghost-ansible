@@ -1,7 +1,6 @@
 ---
 
-dependencies:
-  - { role: debops.nodejs }
+dependencies: []
 
 galaxy_info:
   author: javaguirre

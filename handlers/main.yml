@@ -1,7 +1,9 @@
 ---
 - name: restart ghost
   service: name=ghost state=restarted
+  sudo: true
 
 - name: ensure the Ghost service is started
   service: name=ghost state=started enabled=yes
   tags: [ghost]
+  sudo: true
