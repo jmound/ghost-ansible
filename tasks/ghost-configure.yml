@@ -46,18 +46,33 @@
   tags: [ghost, bug]
   become: yes
 
+- name: get json from S3
+  s3:
+    bucket: "{{ secrets_bucket }}"
+    object: "/environments/{{env}}/env.json"
+    mode: 'getstr'
+    region: "{{ aws_region }}"
+  register: info
+  changed_when: false
+  tags: s3
+
+- set_fact:
+    ses_access_key: "{{(info.contents|from_json).ses.access_key}}"
+  tags: s3
+
+- set_fact:
+    ses_secret_access_key: "{{(info.contents|from_json).ses.secret_access_key}}"
+  tags: s3
+
 - name: Ghost | Configure ghost
   template: src=config.js.j2 dest={{ ghost_install_dir }}/config.js
   notify: restart ghost
   become: yes
   become_user: ghost
-  tags: [config]
+  tags: [config, s3]
 
 - name: ensure the Ghost service is started
   service: name=ghost state=started enabled=yes
   tags: [ghost]
   sudo: true
-
-
-#   # sudo: yes
 
