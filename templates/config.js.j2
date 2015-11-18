@@ -6,7 +6,7 @@ config = {
         url: '{{ghost_url}}',
         mail: {
             transport: 'SMTP',
-            from: '"ReactiveOps Docs" <docs@reactiveops.com>',
+            from: '"{{ses_from_string}}"',
             options: {
                 host: '{{ses_smtp_server_name}}',
                 port: 465,
