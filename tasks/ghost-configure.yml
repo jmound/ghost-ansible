@@ -31,20 +31,10 @@
   become: yes
   become_user: ghost
 
-# - name: Ghost | Update ownership of ghost dir
-#   file: path={{ ghost_install_dir }} owner={{ ghost_user }} recurse=yes state=directory
-#   when: upgrade_ghost or not ghost_release_path.stat.exists
-
 - name: Ghost | Install node dependencies
   npm: path={{ ghost_install_dir }} production=yes
   become: yes
   become_user: ghost
-
-- name: Ghost | Setup Ghost service
-  template: src=ghost.conf.j2 dest=/etc/init/ghost.conf
-  # notify: restart ghost
-  tags: [ghost, bug]
-  become: yes
 
 - name: get json from S3
   s3:
@@ -70,6 +60,12 @@
   become: yes
   become_user: ghost
   tags: [config, s3]
+
+- name: Ghost | Setup Ghost service
+  template: src=etc/init/ghost.conf.j2 dest=/etc/init/ghost.conf
+  notify: restart ghost
+  tags: [ghost, bug]
+  become: yes
 
 - name: ensure the Ghost service is started
   service: name=ghost state=started enabled=yes

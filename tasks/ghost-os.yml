@@ -7,15 +7,3 @@
    - unzip
   tags:
     - packages
-
-   # - npm
-   # - nodejs-legacy
-
-
-
-
-# - name: Ghost | Setup Ghost service
-#   template: src=ghost.conf.j2 dest=/etc/init/ghost.conf
-#   notify: restart ghost
-#   tags: [ghost, bug]
-#   become: yes
